@@ -1,6 +1,6 @@
 ### Model
 
-![Binomial Expanded](/gif/Binomial_exp_eq.gif)
+![Binomial Expanded](/gif/binomial_exp_eq.gif)
 ``` R
 library(bayesLopod)
 x = "bla"
@@ -17,7 +17,7 @@ target += normal_lpdf(bla | 0,1)
 ![qRate Prior](/gif/qRate_prior.gif)
 ![Double Binomial pi](/gif/binomialpiq_eq.gif)
 ![pRange Prior](/gif/pRange_prior.gif)
-![Praw Prior](/gif/Praw_prior.gif)
+![Praw Prior](/gif/praw_prior.gif)
 
 ## Examples
 ### Case Study: _Andropogon gerardii_ (Shape File)
@@ -30,7 +30,7 @@ target += normal_lpdf(bla | 0,1)
 ### Case Study: Simulated Species (Coordinates and Raster)
 
 ![XY-input](/gif/XY_Input.gif)
-![XY-trace](/gif/XYtrace.gif)
-![XY-dens](/gif/XYdens.gif)
-![Probability of presence](/gif/PrPres_eq.gif)
+![XY-trace](/gif/XYTrace.gif)
+![XY-dens](/gif/XYDens.gif)
+![Probability of presence](/gif/prPres_eq.gif)
 ![XY-psi-spplot](/gif/XY_raster.gif)
