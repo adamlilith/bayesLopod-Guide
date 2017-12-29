@@ -13,8 +13,10 @@ target += normal_lpdf(bla | 0,1)
 
 
 ![Double Binomial](/gif/binomialpq_eq.gif)
-![psi Prior](/gif/psi_prior.gif)
-![qRate Prior](/gif/qRate_prior.gif)
+
+|-|-|
+| ![psi Prior](/gif/psi_prior.gif) | ![qRate Prior](/gif/qRate_prior.gif) |
+
 ![Double Binomial pi](/gif/binomialpiq_eq.gif)
 ![pRange Prior](/gif/pRange_prior.gif)
 ![Praw Prior](/gif/praw_prior.gif)
