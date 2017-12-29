@@ -187,6 +187,6 @@ psiRaster = lopodRaster(mLopodRaster, param = "psi_i", extrapolate = T, metric =
 ![Probability of presence](/gif/prPres_eq.gif)
 ``` R
 spplot( raster::stack(psiRaster,ppRaster),  
-        names.attr	=c("Occupancy (Psi)", "Probability of Presence"))
+        names.attr = c("Occupancy (Psi)", "Probability of Presence"))
 ```
 ![XY-psi-spplot](/gif/XY_raster.gif)
