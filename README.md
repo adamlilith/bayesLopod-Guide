@@ -20,7 +20,7 @@ binomial_lpmf(y[cell] | N[cell],p[cell]);
 
 ``` Stan
   target += beta_lpdf(psi_i | 0.5, 0.5);
-  target += normal_lpdf(qRate | 0,0.05);
+  target += normal_lpdf(qRate | 0, 0.05);
 ```
 ![Double Binomial pi](/gif/binomialpiq_eq.gif)
 
@@ -79,10 +79,10 @@ packageVersion("bayesLopod")
 
 ``` R
 data("Andropogon_shape", package = "bayesLopod")
-androSEff = spplot(Andropogon_shape, zcol=c("sampEffort"), main = "Sampling Effort")
-androDetect = spplot(Andropogon_shape, zcol=c("detections"), main = "Detections")
-plot(androSEff, split=c(1,1,2,1), more = T)
-plot(androDetect,  split=c(2,1,2,1), more = F)
+androSEff = spplot(Andropogon_shape, zcol = c("sampEffort"), main = "Sampling Effort")
+androDetect = spplot(Andropogon_shape, zcol = c("detections"), main = "Detections")
+plot(androSEff, split = c(1,1,2,1), more = T)
+plot(androDetect,  split = c(2,1,2,1), more = F)
 ```
 
 ![Andropogon-input](/gif/Andropogon_input.gif)
