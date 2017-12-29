@@ -137,9 +137,56 @@ spplot( AndroShape,
 ![Andropogon-psi-spplot](/gif/Andropogon_psi_spplot.gif)
 
 ### Case Study: Simulated Species (Coordinates and Raster)
+``` R
+data("simSpRecords", package = "bayesLopod")
+data("simSpSamplingEffort", package = "bayesLopod")
+```
+``` R
+simSpRasters = xyToRaster( xyRecords = simSpRecords,x
+                           ySamplingEffort = simSpSamplingEffort,
+                           basemap = NULL,
+                           nrows = 50,
+                           extentExpansion = 0)
 
+spplot(simSpRasters, names.attr	=c("Species Detections","Sampling Effort"))
+```
 ![XY-input](/gif/XY_Input.gif)
+``` R
+ld_Raster_adMatrix = rasterLopodData( rasterN = simSpRasters[["samplingEffort"]],
+                                      rasterY = simSpRasters[["spDetections"]],
+                                      Adjacency = T,
+                                      extSample = 1.0,
+                                      extDetection = 1.0 )
+
+```
+``` R
+mLopodRaster = modelLopod( LopodData = ld_Raster_adMatrix,
+                           varP = F,
+                           q = NULL,
+                           pmin = 0,
+                           CAR = T,
+                           nChains = 4,
+                           warmup = 100,
+                           sampling = 50,
+                           nCores = 4 )
+```
+
+``` R
+lopodTrace( mLopodRaster, inc_warmup = T)
+```
 ![XY-trace](/gif/XYTrace.gif)
+``` R
+lopodDens(mLopodRaster, c("q", "p"))
+```
 ![XY-dens](/gif/XYDens.gif)
+```R
+ppRaster = lopodRaster(mLopodRaster, param = "pp", extrapolate = F, metric = "mean")
+psiRaster = lopodRaster(mLopodRaster, param = "psi_i", extrapolate = T, metric = "mean")
+```
+
 ![Probability of presence](/gif/prPres_eq.gif)
+``` R
+spplot( raster::stack(psiRaster,ppRaster),  
+        names.attr	=c("Occupancy (Psi)", "Probability of Presence"))
+```
 ![XY-psi-spplot](/gif/XY_raster.gif)
