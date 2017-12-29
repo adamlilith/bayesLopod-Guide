@@ -1,4 +1,5 @@
 ###Model
+
 ![Binomial Expanded](/gif/Binomial_exp_eq.gif)
 ``` R
 library(bayesLopod)
@@ -20,6 +21,7 @@ target += normal_lpdf(bla | 0,1)
 
 ##Examples
 ###Case Study: _Andropogon gerardii_ (Shape File)
+
 ![Andropogon-input](/gif/Andropogon_input.gif)
 ![Andropogon-trace](/gif/Andropogon_trace.gif)
 ![Andropogon-dens](/gif/Andropogon_dens.gif)
