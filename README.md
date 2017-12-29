@@ -19,8 +19,10 @@ target += normal_lpdf(bla | 0,1)
 |---|---|
 
 ![Double Binomial pi](/gif/binomialpiq_eq.gif)
-![pRange Prior](/gif/pRange_prior.gif)
-![Praw Prior](/gif/praw_prior.gif)
+
+| ![pRange Prior](/gif/pRange_prior.gif) | ![Praw Prior](/gif/praw_prior.gif) |
+|---|---|
+
 
 ## Examples
 ### Case Study: _Andropogon gerardii_ (Shape File)
