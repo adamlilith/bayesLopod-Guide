@@ -21,24 +21,19 @@ target  +=  binomial_lpmf(y | N, p);
 ```
 #### Detectability
 
-Because `bayesLopod` is designed to for sampling events that have not been systematically designed, detectability (`p`) has a broader interpretation than in traditional occupancy models.  In this case, `p` does not only account for the imperfect capacity of a researcher to detect a species he or she is looking for, but for other complexities of using non systematically collected presence only data. For example `p` would be decreased by reporting bias, in case that a researcher detects an individual of the species the species, but for whatever reason it is not registered in the database used (e.g. is a common species, other individuals have been detected previously, or it is not a species of interest for the collector). Additionally, `bayesLopod` allow flexibility in what `N` represents, and it does not need to be a "sampling event", if this information is not available. `N`, for example, can be the number of detections of individuals in a "target group" (a group of species that a researcher is as likely to collect as the focal species): in this case, `p` represents the ratio of records of the focal species `y` and records of all species in the target group `N`.
+Because `bayesLopod` is designed to for sampling events that have not been systematically designed, detectability (`p`) has a broader interpretation than in traditional occupancy models.  In this case, `p` does not only account for the imperfect capacity of a researcher to detect a species he or she is looking for, but for other complexities of using non systematically collected presence only data. For example `p` would be decreased by reporting bias, in case that a researcher detects an individual of the species the species, but for whatever reason it is not registered in the database used (e.g. is a common species, other individuals have been detected previously, or it is not a species of interest for the collector) as well as the fact that a species might not occupy the entirety of a sampling unit (sampling units that include the range limits, would have smaller `p`).
+
+Additionally, `bayesLopod` allow flexibility in what `N` represents, and it does not need to be a "sampling event", if this information is not available. `N`, for example, can be the number of detections of individuals in a "target group" (a group of species that a researcher is as likely to collect as the focal species): in this case, `p` represents the ratio of records of the focal species `y` and records of all species in the target group `N`.
 
 #### (Site-level) False positives
 
-Quality of
+Because presence-only data are often not collected by the researcher performing the `bayesLopod` model, there is limitations assessing the quality of every record. To allow flexibility in this regard, `bayesLopod` includes a rate of false negatives as a parameter `q`. This parameter can be estimated by the models or defined by the user (for example, if the user is confident there are no false positives, `q` can be set to 0).
 
+It is worth noting that false positives are assessed at the "sampling-unit" level and not at the "record" level. This means that whether a detection is a false positive or not, depends only on the species occurrence in a sampling unit. Importantly, this will leave deem as true detections a set of false detections (those that were made in sampling units in which the species occurs) but will have no effect in the geographical range occupied.
 
+Like probability of detection (`p`), the rate of false positives `q` has a broader interpretation than purely misidentified and mislabeled records. In `bayesLopod`, `q` would also include individuals that are indeed member of the focal species, but not in its main geographical range, for example vagrants, migrants, or invasive species. More research is needed to determine the way range dynamics interact with this parameter.
 
-![Double Binomial](/gif/binomialpq_eq.gif)
-
-``` Stan
-  target  += log_mix( psi_Sampled[cell],
-                      binomial_lpmf(y[cell] | N[cell] , p),
-                      binomial_lpmf(y[cell] | N[cell] , q)
-                      );
-```
-
-While traditional occupancy models that account for false detections require a set of observations that are certain, `bayesLopod` estimates the rate of false detections based on two assumptions:
+Finally, the probability of observing a certain sampling pattern (i.e. number of detection given a number of sampling events; `theta`), if the species **does not** occur in a sampling unit, follows a binomial distribution, with `q` as the "success" rate.  A key distinction with traditional occupancy models, is that to  account for false detections, they require a set of observations that are certain. However, `bayesLopod` estimates the rate of false detections based on two assumptions:
 
 - The rate of false positives `q` is the same across all sampling units.
 - The rate of true detections `p` is greater than that of  false positives `q`
@@ -53,13 +48,29 @@ And is included in the model block of the Stan script as:
   target += normal_lpdf(qRate | 0, 0.05);
 ```
 
-Finally,
+#### Probability of Occupancy (psi)
+
+For each sampling unit, `bayesLopod` estimate a probability of occurrence (psi) maximizing the probability of a sampling pattern `thata` given a detection rate `p` and false positive rate `q`:
+
+![Double Binomial](/gif/binomialpq_eq.gif)
+
+Which is included in the `model` block of the Stan model.
+
+``` Stan
+target  += log_mix( psi_Sampled[cell],
+                   binomial_lpmf(y[cell] | N[cell] , p),
+                   binomial_lpmf(y[cell] | N[cell] , q)
+                   );
+```
+
+Finally, the prior distribution of psi follows a Beta distribution with larger probabilities for values around 0 or 1.
 
 ![psi Prior](/gif/psi_prior.gif)
 ``` Stan
-  target += normal_lpdf(qRate | 0, 0.05);
+  target += binomial_lpdf(psy | 0.5, 0.5);
 ```
 #### Variable detection rates across sampling units
+
 
 ![Double Binomial pi](/gif/binomialpiq_eq.gif)
 
@@ -91,6 +102,7 @@ Finally,
   target += normal_lpdf(pmin | 0.5, 0.25);
   target += normal_lpdf(pmax | 0.5, 0.25);
 ```
+#### CAR model
 
 ``` Stan
   target += sparse_car_lpdf(psi_i | tau, alpha, W_sparse, D_sparse, lambda, n, W_n);
