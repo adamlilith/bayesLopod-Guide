@@ -1,10 +1,33 @@
-### Model
+# bayesLopod
+###### Bayesian Inference of Landscape Occupancy from Presence-Only Data
+
+Natural history museums and herbaria collectively hold hundreds of millions of zoological, botanical, and paleontological specimens. These collections serve as the foundation for understanding the distribution of life on Earth and the basis for addressing loss of biodiversity, emerging diseases, and other pressing global problems as well as important question in ecology and evolution. One of the short comings of these kind of data is that the lack of evidence of the presence of a species in a certain region does not mean the species is truly absent there. Likewise, specimens are often misidentified, and therefore the report of a species in a locality is not always evidence that a viable population occurs there. The goal of this project is to develop a method which could be used to estimate the probability of presence of a species in sampling units of a study region based on certain sampling effort and presence detections pattern.
+
+***
+
+## Model
+
+### `bayesLopod` as an occupancy model
+
+[BRIEF EXPLANATION OF OCCUPANCY MODELS, VARIATION ACROSS SAMPLING EVENTS USING BENULLI PROCESSES]
+
+`bayesLopod` assumes that on average, detectability is the same in a sampling unit, and therefore the probability of observing a certain sampling pattern (i.e. number of detection given a number of sampling events; `theta`), if the species occurs in a sampling unit, follows a binomial distribution:   
 
 ![Binomial Expanded](/gif/binomial_exp_eq.gif)
+ in Stan, the log-probability of `y` detections, given `N` sampling events and, `p` detectability for each sampling unit, can be added to the target log-probability in the model block:
 
 ``` Stan
-binomial_lpmf(y[cell] | N[cell],p[cell]);
+target  +=  binomial_lpmf(y | N, p);
 ```
+#### Detectability
+
+Because `bayesLopod` is designed to for sampling events that have not been systematically designed, detectability (`p`) has a broader interpretation than in traditional occupancy models.  In this case, `p` does not only account for the imperfect capacity of a researcher to detect a species he or she is looking for, but for other complexities of using non systematically collected presence only data. For example `p` would be decreased by reporting bias, in case that a researcher detects an individual of the species the species, but for whatever reason it is not registered in the database used (e.g. is a common species, other individuals have been detected previously, or it is not a species of interest for the collector). Additionally, `bayesLopod` allow flexibility in what `N` represents, and it does not need to be a "sampling event", if this information is not available. `N`, for example, can be the number of detections of individuals in a "target group" (a group of species that a researcher is as likely to collect as the focal species): in this case, `p` represents the ratio of records of the focal species `y` and records of all species in the target group `N`.
+
+#### (Site-level) False positives
+
+Quality of
+
+
 
 ![Double Binomial](/gif/binomialpq_eq.gif)
 
@@ -15,13 +38,29 @@ binomial_lpmf(y[cell] | N[cell],p[cell]);
                       );
 ```
 
-| ![psi Prior](/gif/psi_prior.gif) | ![qRate Prior](/gif/qRate_prior.gif) |
-|---|---|
+While traditional occupancy models that account for false detections require a set of observations that are certain, `bayesLopod` estimates the rate of false detections based on two assumptions:
 
+- The rate of false positives `q` is the same across all sampling units.
+- The rate of true detections `p` is greater than that of  false positives `q`
+
+The prior distribution of `qRate` (`q` / `p`) is:
+
+
+ ![qRate Prior](/gif/qRate_prior.gif)
+
+And is included in the model block of the Stan script as:
 ``` Stan
-  target += beta_lpdf(psi_i | 0.5, 0.5);
   target += normal_lpdf(qRate | 0, 0.05);
 ```
+
+Finally,
+
+![psi Prior](/gif/psi_prior.gif)
+``` Stan
+  target += normal_lpdf(qRate | 0, 0.05);
+```
+#### Variable detection rates across sampling units
+
 ![Double Binomial pi](/gif/binomialpiq_eq.gif)
 
 

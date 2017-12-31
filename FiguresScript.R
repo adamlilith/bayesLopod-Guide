@@ -50,7 +50,7 @@ spplot(simSpRasters, names.attr	=c("Species Detections","Sampling Effort"))
 ##XY Model
 simSpRasters = xyToRaster(xyRecords = simSpRecords,xySamplingEffort = simSpSamplingEffort,basemap = NULL, nrows = 50, extentExpansion = 0)
 ld_Raster_adMatrix = rasterLopodData(rasterN = simSpRasters[["samplingEffort"]], rasterY = simSpRasters[["spDetections"]], Adjacency = T )
-#mLopodRaster = modelLopod(LopodData = ld_Raster_adMatrix, varP = F, q = NULL, pmin = 0, CAR = T,nChains = 4,warmup = 100,sampling = 50,nCores = 4)3
+#mLopodRaster = modelLopod(LopodData = ld_Raster_adMatrix, varP = F, q = NULL, pmin = 0, CAR = T,nChains = 4,warmup = 100,sampling = 50,nCores = 4)
 #save(mLopodRaster, file = "c:/github/bayesLopod guide/Objects/XY_Model.rda")
 
 #XYTrace
