@@ -71,14 +71,18 @@ Finally, the prior distribution of psi follows a Beta distribution with larger p
 ```
 #### Variable detection rates across sampling units
 
+The examples above include models in which detectability `p` is the same across all sampling units. However, `bayesLopod` allow for variation in detectability by assigning a `p` rate for each of the sampling units:
 
 ![Double Binomial pi](/gif/binomialpiq_eq.gif)
 
+ To do so, it first determines a range (between `pmax` and `pmin`), and then determines a number between 0 and 1 for each of the sampling units (`praw`). If `praw` = 0, then the `p` value for that cell is `pmin`, and if `praw` = 1,  the `p` value for that cell is `pmax`. This is calculated in the `transformed parameters` block in the Stan scripts in which `p` varies:
 
 ``` Stan
   pRange = pmax - pmin;
   p = (p_raw * pRange) + pmin ;
 ```
+
+Then, the 'model' block in these scripts is modified slightly to reflect the variable rate (note that `p[cell]` refers to a sampling unit value, whereas `q` is global)
 
 ``` Stan
   target  += log_mix( psi_Sampled[cell],
@@ -87,13 +91,21 @@ Finally, the prior distribution of psi follows a Beta distribution with larger p
                       );
 ```
 
+Lastly, `pRange` and `praw` have priors as follows:
+
+- `pRange` around 0, making `pmin` and `pmax` close to each other.
+- `praw` around 1, making most values of `p` close to `pmax`
+
 | ![pRange Prior](/gif/pRange_prior.gif) | ![Praw Prior](/gif/praw_prior.gif) |
 |---|---|
+
 
 ``` Stan
   target += normal_lpdf(pRange | 0, 0.1);
   target += normal_lpdf(p_raw  | 1, 0.25);
 ```
+
+While `pmin` and `pmin` have broadly non informative priors:
 
 | ![pRange Prior](/gif/pmin_prior.gif) | ![Praw Prior](/gif/pmax_prior.gif) |
 |---|---|
@@ -103,6 +115,10 @@ Finally, the prior distribution of psi follows a Beta distribution with larger p
   target += normal_lpdf(pmax | 0.5, 0.25);
 ```
 #### CAR model
+
+`bayesLopod` allows unsampled or poorly sampled sampling units to borrow power to predict occupancy based on the patterns of its neighboring units (i.e. a cell is more likely to be occupied if it is surrounded by cells in which the species is present). We do so by implementing a  conditional autoregressive (CAR) model, in which psi is spatially autocorrelated. We thank  @mbjoseph for making the code for this analyses publically available  [(see github repository for more details about this model in Stan and CAR in general)](https://github.com/mbjoseph/CARstan).
+
+In addition to the `function` block defining `sparse_car_lpdf` the followin lines are added to the `model` block in the Stan files for models in which CAR is used. 
 
 ``` Stan
   target += sparse_car_lpdf(psi_i | tau, alpha, W_sparse, D_sparse, lambda, n, W_n);
